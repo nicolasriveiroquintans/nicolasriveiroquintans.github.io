@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOE Flame Diverter Plate Analysis | Nicolas Riveiro Quintans</title>
+<meta name="description" content="Plume, force and transient heat-transfer model that picks the thickness, height and angle of the flame diverter plate under the vertical test stand.">
+<meta property="og:title" content="MOE Flame Diverter Plate Analysis | Nicolas Riveiro Quintans">
+<meta property="og:description" content="Plume, force and transient heat-transfer model that picks the thickness, height and angle of the flame diverter plate under the vertical test stand.">
+<meta property="og:image" content="../assets/img/triton-poster.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0b0d'/%3E%3Cpath d='M32 10 L44 40 L32 34 L20 40Z' fill='%23e5372b'/%3E%3Cpath d='M26 44 Q32 58 38 44' stroke='%23ff7a6e' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Nicolas <span>Riveiro</span></a>
+    <nav class="nav-links">
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#resume">Resume</a>
+      <a class="btn small" href="../index.html#contact">Contact</a>
+    </nav>
+    <button class="menu-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<section class="p-hero plain">
+  <div class="wrap">
+    <a class="back mono" href="../index.html#projects">&larr; All projects</a>
+    <div class="mono accent" style="margin-bottom:14px">Heat Transfer &middot; Experimental Rocket Propulsion Lab</div>
+    <div class=""><div>
+    <h1>MOE Flame Diverter Plate Analysis</h1>
+    <p class="sub">Sizing the flame diverter plate that sits under the MOE engine on the vertical test stand: from CEA combustion data to plume structure, plate loads and a transient thermal check.</p>
+    </div></div>
+  </div>
+</section>
+<div class="wrap">
+  <div class="facts reveal">
+    <div class="fact"><div class="k mono">Organization</div><div class="v">Experimental Rocket Propulsion Lab</div></div>
+    <div class="fact"><div class="k mono">Role</div><div class="v">Author / Analyst</div></div>
+    <div class="fact"><div class="k mono">Timeline</div><div class="v">Aug 2026 to Present</div></div>
+    <div class="fact"><div class="k mono">Tools</div><div class="v">Python, NASA CEA (RocketCEA), NumPy, pandas</div></div>
+  </div>
+  <div class="p-body">
+    <article class="prose reveal">
+      <h2>Why this plate matters</h2>
+<p>On the <a class="inline" href="vertical-test-stand.html">vertical test stand</a> the MOE engine fires straight down, so a steel plate has to turn the plume sideways without melting or losing strength. Its loads also go straight into the stand: the vertical part into the stand legs and the horizontal part into the bolts and bracing. I wrote a Python model that goes from the engine's combustion conditions all the way to a pass/fail answer for every plate <strong>thickness, height below the nozzle and angle</strong>. The plate material was switched from a castable refractory to <strong>A500 carbon steel</strong> along the way.</p>
+<p>The design space: a 24 x 24 in plate, 4 thicknesses (1/4, 3/8, 1/2 and 3/4 in), 4 heights (2 to 3.5 ft below the nozzle exit) and 18 angles (0&deg; to 85&deg; from the ground). That's 288 configurations.</p>
+
+<h2>Calculation process</h2>
+<ol class="steps">
+<li><div class="st">Nozzle geometry</div>
+<p>From the engine drawing: 1.930 in throat, 4.846 in exit, 5.000 in chamber diameter and 7.125 in chamber length. Chamber pressure 500 psia, O/F 1.1, sea-level ambient.</p>
+<div class="eq">&epsilon; = A<sub>e</sub>/A<sub>t</sub> = 6.305 &nbsp;&middot;&nbsp; CR = 6.712 &nbsp;&middot;&nbsp; L* = 1.215 m</div></li>
+
+<li><div class="st">Combustion with NASA CEA</div>
+<p>Ran an equilibrium rocket case (infinite area combustor) for liquid IPA and LOX through RocketCEA, then pulled temperatures, specific heats, speed of sound, exit Mach, c* and exit pressure.</p>
+<div class="eq">T<sub>c</sub> = 2,296 K &nbsp;&middot;&nbsp; M<sub>e</sub> = 3.08 &nbsp;&middot;&nbsp; P<sub>e</sub> = 0.714 bar (overexpanded) &nbsp;&middot;&nbsp; c* = 1,567 m/s</div></li>
+
+<li><div class="st">Mass flow and thrust</div>
+<p>Mass flow from chamber pressure and c*, then thrust as a momentum term plus a pressure term, checked against CEA's thrust coefficient.</p>
+<div class="eq">&#7745; = P<sub>c</sub>A<sub>t</sub>/c* = 4.15 kg/s &nbsp;&middot;&nbsp; F = &#7745;V<sub>e</sub> + (P<sub>e</sub> &minus; P<sub>a</sub>)A<sub>e</sub> = 9,578 N (2,153 lbf) &nbsp;&middot;&nbsp; Isp = 235 s</div></li>
+
+<li><div class="st">Fully expanded plume</div>
+<p>The jet leaves below ambient pressure and gets squeezed right after the exit. Isentropic relations give its Mach number and diameter once it matches ambient.</p>
+<div class="eq">M<sub>e</sub> 3.08 &rarr; M<sub>fe</sub> 2.89 &nbsp;&middot;&nbsp; D<sub>e</sub> 12.3 cm &rarr; D<sub>fe</sub> 10.9 cm</div></li>
+
+<li><div class="st">Shock-cell length</div>
+<p>Prandtl-Pack relation, with the theoretical constant (1.306) and an empirical one (1.1), to see which "Mach diamond" each plate height lands in.</p>
+<div class="eq">L<sub>s</sub> = C &radic;(M<sub>fe</sub>&sup2; &minus; 1) D<sub>fe</sub> = 0.32 to 0.38 m &nbsp;&rarr;&nbsp; plate sits in shock cell 2 to 4</div></li>
+
+<li><div class="st">Potential core length</div>
+<p>From NASA SP-8072 (Eldred, 1971). Inside the core the centerline gas is exactly what left the nozzle: full velocity, full stagnation temperature, no air mixed in.</p>
+<div class="eq">L<sub>c</sub>/D<sub>e</sub> = 3.45 (1 + 0.38 M<sub>e</sub>)&sup2; = 16.3 &nbsp;&rarr;&nbsp; L<sub>c</sub> = 2.0 m. Every plate height (0.61 to 1.07 m) is inside the core.</div></li>
+
+<li><div class="st">Plume size at the plate</div>
+<p>Core diameter shrinks linearly to the end of the core, and a turbulent mixing layer grows on the outside. The outer growth rate uses incompressible spreading (~0.95, DNS data) times a supersonic compressibility factor (~0.2, Papamoschou &amp; Roshko 1988).</p>
+<div class="eq">D<sub>core</sub> = D<sub>fe</sub>(1 &minus; x/L<sub>c</sub>) = 5 to 7.5 cm &nbsp;&middot;&nbsp; D<sub>out</sub> = D<sub>core</sub> + 2&delta; = 34 to 51 cm footprint</div></li>
+
+<li><div class="st">Forces on the plate (and into the stand)</div>
+<p>Inside the core the jet momentum flux equals the thrust. Splitting it by the impingement angle gives the load on the plate, the vertical part that goes into the stand legs, and the horizontal part the bolts and bracing have to take. A dynamic load factor of 2 covers the startup transient.</p>
+<div class="eq">F<sub>n</sub> = J sin&theta;<sub>imp</sub> &nbsp;&middot;&nbsp; F<sub>axial</sub> = F<sub>n</sub> sin&theta;<sub>imp</sub> &nbsp;&middot;&nbsp; F<sub>side</sub> = F<sub>n</sub> cos&theta;<sub>imp</sub> &nbsp;&middot;&nbsp; at 30&deg;: 8.3 / 7.2 / 4.1 kN</div></li>
+
+<li><div class="st">Plate pressure</div>
+<p>Peak pressure is the pitot pressure behind a normal shock (Rayleigh formula), spread with a modified Newtonian distribution. Average pressure comes from the normal force over the elliptical footprint, and the model flags any case where the plume spills off the plate.</p>
+<div class="eq">p<sub>02</sub> = 10.4 bar abs at the stagnation point</div></li>
+
+<li><div class="st">Gas state and transport properties at the stagnation point</div>
+<p>The gas is brought to rest at chamber temperature. Density from the ideal gas law, and c<sub>p</sub>, viscosity, conductivity and Prandtl number from CEA's chamber transport properties (equilibrium, which is slightly conservative), converted to SI and cross-checked with Pr = c<sub>p</sub>&mu;/k.</p>
+<div class="eq">T = 2,296 K &nbsp;&middot;&nbsp; &rho; = 0.98 kg/m&sup3; &nbsp;&middot;&nbsp; Pr = 0.54</div></li>
+
+<li><div class="st">Velocity gradient at the stagnation point</div>
+<p>How fast the gas speeds up as it spreads sideways from the stagnation point. Derived from the Newtonian pressure drop plus Euler's equation (Anderson, ch. 6).</p>
+<div class="eq">&beta; = (1/R) &radic;(2(p<sub>stag</sub> &minus; P<sub>a</sub>)/&rho;) &asymp; 25,500 1/s for a flat plate</div></li>
+
+<li><div class="st">Stagnation-point heat flux</div>
+<p>Sibulkin / Fay-Riddell correlation with a 2x margin for turbulence and unsteadiness, plus gas radiation folded into an effective gas temperature.</p>
+<div class="eq">h = SF &middot; 0.763 Pr<sup>&minus;0.6</sup> &radic;(&rho;&mu;&beta;) c<sub>p</sub> (T<sub>0</sub>/T<sub>i</sub>)<sup>0.03</sup> &nbsp;&rarr;&nbsp; h<sub>max</sub> = 7,760 W/m&sup2;K, q<sub>max</sub> = 15.7 MW/m&sup2;</div></li>
+
+<li><div class="st">Transient conduction through the steel</div>
+<p>1D explicit finite difference with 41 nodes through the thickness: convective hot face, insulated back face, and steel conductivity and specific heat re-evaluated every step from each node's temperature (Eurocode 3, EN 1993-1-2). The time step is set by the stability limit Fo(1 + Bi) &le; 1/2. Each run is simulated out to 15 s of hot-fire.</p>
+<div class="eq">&rho;c&Delta;x dT<sub>i</sub>/dt = q<sub>i&rarr;i+1</sub> &minus; q<sub>i&minus;1&rarr;i</sub> &nbsp;&middot;&nbsp; 2,900 to 24,000 time steps per thickness</div></li>
+
+<li><div class="st">Pass / fail</div>
+<p>A configuration passes if the surface stays under the melting limit (1,700 K) <strong>and</strong> the through-thickness average stays under the strength limit (550 &deg;C). For each thickness and height, the code finds the minimum angle that passes with every steeper angle also passing.</p></li>
+</ol>
+
+<h2>Results</h2>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr><th>Plate thickness</th><th>Minimum passing angle (3.5 s burn)</th></tr></thead>
+<tbody><tr><td>1/4 in</td><td>75&deg;</td></tr><tr><td>3/8 in</td><td>50&deg;</td></tr><tr><td>1/2 in</td><td class="ok">Any angle</td></tr><tr><td>3/4 in</td><td class="ok">Any angle</td></tr></tbody></table></div>
+<p>The answer is the same at every height from 2 to 3.5 ft, because the plate always sits inside the potential core where the gas hasn't slowed down yet. That gives the stand design freedom to place the plate where it fits best. The 3D maps extend this to longer hot-fires (up to 15 s): the cyan line on each surface is the minimum plate angle that still passes for a given burn duration.</p>
+      <div class="gallery"><figure class="full"><img src="../assets/img/diverter-plume.jpg" alt="Plume structure: potential core, mixing layer, shock cells and candidate plate positions." loading="lazy"><figcaption>Plume structure: potential core, mixing layer, shock cells and candidate plate positions.</figcaption></figure>
+<figure><img src="../assets/img/diverter-sp8072.jpg" alt="Core length correlation, NASA SP-8072 (Eldred, 1971)." loading="lazy"><figcaption>Core length correlation, NASA SP-8072 (Eldred, 1971).</figcaption></figure>
+<figure><img src="../assets/img/diverter-force-diagram.jpg" alt="How the plume load splits into normal, axial (stand legs) and side (bracing) forces." loading="lazy"><figcaption>How the plume load splits into normal, axial (stand legs) and side (bracing) forces.</figcaption></figure>
+<figure><img src="../assets/img/diverter-forces.jpg" alt="Plate forces vs plate angle, including the design load with DLF = 2." loading="lazy"><figcaption>Plate forces vs plate angle, including the design load with DLF = 2.</figcaption></figure>
+<figure><img src="../assets/img/diverter-pressure-angle.jpg" alt="Peak and average plate pressure vs angle (x = plume spills off the plate)." loading="lazy"><figcaption>Peak and average plate pressure vs angle (x = plume spills off the plate).</figcaption></figure>
+<figure class="full"><img src="../assets/img/diverter-pressure-map.jpg" alt="Average pressure on the plate for every height and angle." loading="lazy"><figcaption>Average pressure on the plate for every height and angle.</figcaption></figure>
+<figure class="full"><img src="../assets/img/diverter-thermal-3d.jpg" alt="Surface, through-thickness average and back-face temperature vs plate angle and hot-fire duration (0 to 15 s), one row per thickness. Cyan line = pass/fail boundary." loading="lazy"><figcaption>Surface, through-thickness average and back-face temperature vs plate angle and hot-fire duration (0 to 15 s), one row per thickness. Cyan line = pass/fail boundary.</figcaption></figure></div>
+      <h2>How it ties into the stand</h2>
+<p>This model and the <a class="inline" href="vertical-test-stand.html">vertical test stand</a> were designed together. The stand sets where the plate can physically go (2 to 3.5 ft below the nozzle). The diverter model hands back the loads the plate pushes into the stand: the axial part goes into the legs and the side part into the bolts and bracing.</p>
+    </article>
+    <aside class="aside reveal d1">
+      <div class="side-box"><h3>Key numbers</h3><div class="item"><div class="num">288</div><span>Plate configurations checked</span></div>
+<div class="item"><div class="num">2,153 lbf</div><span>MOE sea-level thrust (CEA)</span></div>
+<div class="item"><div class="num">15.7 MW/m&sup2;</div><span>Peak stagnation heat flux</span></div>
+<div class="item"><div class="num">1/2 in</div><span>A500 thickness that passes at every angle</span></div></div>
+      <a class="side-box related" href="vertical-test-stand.html"><div class="mono accent">Linked project</div><h3 style="margin:8px 0 6px">Vertical Test Stand &rarr;</h3><span>The structure this plate mounts to and loads.</span></a>
+      <a class="btn ghost" href="../assets/docs/Nicolas-Riveiro-Resume.pdf" target="_blank" rel="noopener">Resume (PDF) &darr;</a>
+    </aside>
+  </div>
+  <nav class="p-nav">
+    <a class="prev" href="copv-pressurization-model.html"><div class="mono" style="color:var(--dim)">&larr; Previous</div><div class="t">COPV Pressurization Model</div></a>
+    <a class="next" href="vertical-test-stand.html"><div class="mono" style="color:var(--dim)">Next &rarr;</div><div class="t">Vertical Test Stand</div></a>
+  </nav>
+</div>
+<footer>
+  <div class="wrap mono">
+    <span>&copy; <span class="year">2026</span> Nicolas Riveiro Quintans</span>
+    <span>Aerospace Engineering &middot; Embry-Riddle Aeronautical University</span>
+  </div>
+</footer>
+<div class="lightbox" role="dialog" aria-modal="true"><img alt=""><div class="cap mono"></div></div>
+<script src="../js/main.js"></script>
+</body>
+</html>

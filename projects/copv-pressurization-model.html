@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COPV Pressurization Profile Model | Nicolas Riveiro Quintans</title>
+<meta name="description" content="Transient real-gas model of a GN2 fill into composite overwrapped pressure vessels, with event-driven valve control that keeps the composite under its temperature limit.">
+<meta property="og:title" content="COPV Pressurization Profile Model | Nicolas Riveiro Quintans">
+<meta property="og:description" content="Transient real-gas model of a GN2 fill into composite overwrapped pressure vessels, with event-driven valve control that keeps the composite under its temperature limit.">
+<meta property="og:image" content="../assets/img/triton-poster.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0b0d'/%3E%3Cpath d='M32 10 L44 40 L32 34 L20 40Z' fill='%23e5372b'/%3E%3Cpath d='M26 44 Q32 58 38 44' stroke='%23ff7a6e' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Nicolas <span>Riveiro</span></a>
+    <nav class="nav-links">
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#resume">Resume</a>
+      <a class="btn small" href="../index.html#contact">Contact</a>
+    </nav>
+    <button class="menu-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<section class="p-hero plain">
+  <div class="wrap">
+    <a class="back mono" href="../index.html#projects">&larr; All projects</a>
+    <div class="mono accent" style="margin-bottom:14px">Simulation &middot; Experimental Rocket Propulsion Lab</div>
+    <div class="hero-split"><div>
+    <h1>COPV Pressurization Profile Model</h1>
+    <p class="sub">A transient thermodynamic model that schedules GN2 fills of COPVs while keeping the composite overwrap below its temperature limit.</p>
+    </div><figure class="hero-fig"><img src="../assets/img/copv-temperatures.jpg" alt="COPV Pressurization Profile Model plot"></figure></div>
+  </div>
+</section>
+<div class="wrap">
+  <div class="facts reveal">
+    <div class="fact"><div class="k mono">Organization</div><div class="v">Experimental Rocket Propulsion Lab</div></div>
+    <div class="fact"><div class="k mono">Role</div><div class="v">Author / Analyst</div></div>
+    <div class="fact"><div class="k mono">Timeline</div><div class="v">Sep 2026</div></div>
+    <div class="fact"><div class="k mono">Tools</div><div class="v">Python, CoolProp, SciPy, Jupyter</div></div>
+  </div>
+  <div class="p-body">
+    <article class="prose reveal">
+      <h2>The problem</h2>
+<p>Filling a COPV fast heats the gas inside it, and the carbon-fiber overwrap has a temperature limit. Our COPVs have no temperature instrumentation, so the valve schedule has to rely on a model. I built one that predicts the pressure and temperature history of the source bottles, the COPV gas, the aluminum liner and a multilayer overwrap (carbon fiber, insulation, fiberglass), then decides when to open and close the fill solenoid.</p>
+<h2>How the model works</h2>
+<ul>
+<li><strong>Real-gas mass and energy balances</strong> for the source and the COPV using CoolProp (Helmholtz equation of state).</li>
+<li><strong>Compressible flow</strong> through a solenoid and a flow-limiting orifice in series, handling both choked and unchoked conditions.</li>
+<li><strong>Transient conduction</strong> through the wall: a lumped liner plus a multi-node discretization of each overwrap layer.</li>
+<li><strong>Event-driven valve control</strong> with three temperature-limit strategies, integrated with event detection (Brent's method to pin down the exact closing time).</li>
+</ul>
+<h2>Three control strategies</h2>
+<p><strong>Gas mode</strong> closes the valve when the gas hits the limit. It's the most conservative, since the gas is always the hottest component. <strong>Wall mode</strong> closes when the predicted peak liner temperature hits its limit, using an energy-balance upper bound that doesn't depend on the uncertain heat transfer coefficient. <strong>Lookahead mode</strong> keeps simulating "what if I close now?" with the full model and closes right before the inner carbon-fiber node would exceed its limit.</p>
+<h2>Results</h2>
+      <div class="gallery"><figure class="full"><img src="../assets/img/copv-temperatures.jpg" alt="Temperatures and COPV pressure (lookahead mode): gas, source, liner and the 8 composite nodes from inner to outer, with the valve open/close events and limits." loading="lazy"><figcaption>Temperatures and COPV pressure (lookahead mode): gas, source, liner and the 8 composite nodes from inner to outer, with the valve open/close events and limits.</figcaption></figure>
+<figure class="full"><img src="../assets/img/copv-pressure-profile.jpg" alt="Pressurization profile (lookahead mode): COPV pressure rises almost linearly while the orifice is choked, then a slow heat-transfer-limited tail." loading="lazy"><figcaption>Pressurization profile (lookahead mode): COPV pressure rises almost linearly while the orifice is choked, then a slow heat-transfer-limited tail.</figcaption></figure>
+<figure class="full"><img src="../assets/img/copv-valve-flow.jpg" alt="Valve-train mass flow vs pressure ratio, choked to unchoked." loading="lazy"><figcaption>Valve-train mass flow vs pressure ratio, choked to unchoked.</figcaption></figure>
+<figure class="full"><img src="../assets/img/copv-strategies.jpg" alt="Comparison of the three temperature-limit strategies." loading="lazy"><figcaption>Comparison of the three temperature-limit strategies.</figcaption></figure></div>
+      <h2>What I learned from it</h2>
+<ul>
+<li>Limiting the predicted wall temperature instead of the gas temperature shortens the fill, because early on the cold wall can soak up the heat of a small gas mass.</li>
+<li>Most of the fill time is the slow tail after the pressures equalize, which is limited by heat transfer and not by the valve.</li>
+<li>Cascading the source (keeping one full bottle for the top-off) is the most effective way to shorten that tail.</li>
+</ul>
+<div class="callout">Next steps: calibrate the discharge coefficient and internal heat transfer coefficient against a real test fill, add bottle cascading to the valve logic, and run a sensitivity study on the overwrap layer properties.</div>
+    </article>
+    <aside class="aside reveal d1">
+      <div class="side-box"><h3>Key numbers</h3><div class="item"><div class="num">3</div><span>Valve control strategies compared</span></div>
+<div class="item"><div class="num">5</div><span>Thermal layers modeled (gas, liner, CF, insulation, fiberglass)</span></div>
+<div class="item"><div class="num">Real gas</div><span>CoolProp Helmholtz EOS</span></div></div>
+      
+      <a class="btn ghost" href="../assets/docs/Nicolas-Riveiro-Resume.pdf" target="_blank" rel="noopener">Resume (PDF) &darr;</a>
+    </aside>
+  </div>
+  <nav class="p-nav">
+    <a class="prev" href="feed-system-ops.html"><div class="mono" style="color:var(--dim)">&larr; Previous</div><div class="t">Feed System Test Ops</div></a>
+    <a class="next" href="flame-diverter.html"><div class="mono" style="color:var(--dim)">Next &rarr;</div><div class="t">Flame Diverter Analysis</div></a>
+  </nav>
+</div>
+<footer>
+  <div class="wrap mono">
+    <span>&copy; <span class="year">2026</span> Nicolas Riveiro Quintans</span>
+    <span>Aerospace Engineering &middot; Embry-Riddle Aeronautical University</span>
+  </div>
+</footer>
+<div class="lightbox" role="dialog" aria-modal="true"><img alt=""><div class="cap mono"></div></div>
+<script src="../js/main.js"></script>
+</body>
+</html>

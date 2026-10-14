@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vertical Test Stand Thrust Structure | Nicolas Riveiro Quintans</title>
+<meta name="description" content="Led the CAD, FEA and manufacturing of a vertical test stand for a 2,200 lbf engine, with a Python hand-calc tool and a flame diverter model built alongside it.">
+<meta property="og:title" content="Vertical Test Stand Thrust Structure | Nicolas Riveiro Quintans">
+<meta property="og:description" content="Led the CAD, FEA and manufacturing of a vertical test stand for a 2,200 lbf engine, with a Python hand-calc tool and a flame diverter model built alongside it.">
+<meta property="og:image" content="../assets/img/triton-poster.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0b0d'/%3E%3Cpath d='M32 10 L44 40 L32 34 L20 40Z' fill='%23e5372b'/%3E%3Cpath d='M26 44 Q32 58 38 44' stroke='%23ff7a6e' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Nicolas <span>Riveiro</span></a>
+    <nav class="nav-links">
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#resume">Resume</a>
+      <a class="btn small" href="../index.html#contact">Contact</a>
+    </nav>
+    <button class="menu-btn" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<section class="p-hero"><img class="bg" src="../assets/img/vtsd-frame.jpg" alt="">
+  <div class="wrap">
+    <a class="back mono" href="../index.html#projects">&larr; All projects</a>
+    <div class="mono accent" style="margin-bottom:14px">Structures &middot; Experimental Rocket Propulsion Lab</div>
+    <div class=""><div>
+    <h1>Vertical Test Stand Thrust Structure</h1>
+    <p class="sub">Thrust structure for ERPL's vertical test stand, designed for a 2,200 lbf engine firing straight down.</p>
+    </div></div>
+  </div>
+</section>
+<div class="wrap">
+  <div class="facts reveal">
+    <div class="fact"><div class="k mono">Organization</div><div class="v">Experimental Rocket Propulsion Lab</div></div>
+    <div class="fact"><div class="k mono">Role</div><div class="v">Design Lead</div></div>
+    <div class="fact"><div class="k mono">Timeline</div><div class="v">Aug 2026 to Present</div></div>
+    <div class="fact"><div class="k mono">Tools</div><div class="v">Autodesk Inventor, ANSYS FEA, Python</div></div>
+  </div>
+  <div class="p-body">
+    <article class="prose reveal">
+      <h2>Overview</h2>
+<p>I lead the <strong>3D CAD (Inventor), FEA (ANSYS) and manufacturing</strong> of the thrust structure for ERPL's vertical test stand (VTSD), sized for a <strong>2,200 lbf</strong> vehicle engine. The engine fires straight down, so the project has two halves that depend on each other: the structure that holds the engine and reacts its thrust, and the <a class="inline" href="flame-diverter.html">flame diverter plate</a> underneath that turns the plume away.</p>
+<h2>Design</h2>
+<ul>
+<li>Square-geometry frame from <strong>A500 2 x 2 x 1/4 in tubing</strong>, with triangular gusset brackets at the corners and T-junctions and tie-down points on the outer posts. It evolved from an earlier 80/20 extrusion concept.</li>
+<li>Modeled in <strong>Autodesk Inventor</strong> with frame generator skeletons, in a full assembly with the thrust plate, an engine stand-in and the flame diverter.</li>
+<li>Bill of materials and drawing package on the ERPL drawing template.</li>
+</ul>
+<h2>Calculation process</h2>
+<p>Alongside the ANSYS FEA, I wrote a Python hand-calc tool so every geometry change could be re-checked in seconds. Its steps:</p>
+<ol class="steps">
+<li><div class="st">Inputs</div><p>Engine thrust and a 1.5 safety factor on it, A500 Grade C properties (E = 29,000 ksi, F<sub>y</sub> = 50 ksi, F<sub>u</sub> = 62 ksi), tube area and moment of inertia, and the post and cable node coordinates measured from the CAD.</p></li>
+<li><div class="st">Self-weight</div><p>Frame weight from the solid volume of the CAD model (878 in&sup3;) times the steel density. It partly offsets the uplift.</p></li>
+<li><div class="st">Tie-down cable tensions</div><p>Rigid-body statics (force and moment balance) solved by least squares for the 4 outer tie-down cables, flagging any cable that would go slack.</p></li>
+<li><div class="st">Post forces</div><p>The net vertical load is distributed across the 6 posts with a rigid-diaphragm (bolt-group) method, so off-center thrust loads the nearer posts more.</p></li>
+<li><div class="st">Stress check</div><p>Axial stress in every post against the A500 allowables.</p></li>
+<li><div class="st">Euler buckling</div><p>Critical load of the posts for a compression load case. Under normal firing the posts are in tension, so buckling only governs in the alternate case.</p></li>
+<li><div class="st">Cable capacity</div><p>Cable tension against the working load limit, with a factor of safety for each cable.</p></li>
+<li><div class="st">Deflection</div><p>Axial-only estimate of the deflection at the thrust point. It leaves out bending, so it's optimistic and only used as a cross-check against the FEA.</p></li>
+</ol>
+<h2>The flame diverter link</h2>
+<p>The plate under the engine was sized with my <a class="inline" href="flame-diverter.html">flame diverter model</a>. The two depend on each other:</p>
+<ul>
+<li>The <strong>stand geometry sets the design space</strong> for the plate: 2 to 3.5 ft below the nozzle exit, 24 x 24 in.</li>
+<li>The diverter model returns the <strong>loads the plate puts back into the stand</strong>: the axial part into the legs and the side part into the bolts and bracing (for example 7.2 kN and 4.1 kN at a 30&deg; plate), with a dynamic load factor of 2 for startup.</li>
+<li>It also confirmed that the plate height doesn't change the thermal result (the plate is always inside the plume's potential core), so the plate can go wherever it fits the frame best. A 1/2 in A500 plate passes at any angle.</li>
+</ul>
+<h2>Media</h2>
+      <div class="gallery"><figure class="full"><img class="photo" src="../assets/img/vtsd-frame.jpg" alt="Square geometry VTSD final assembly (rendered from the CAD export)." loading="lazy"><figcaption>Square geometry VTSD final assembly (rendered from the CAD export).</figcaption></figure>
+<figure class="full"><img src="../assets/img/diverter-force-diagram.jpg" alt="Diverter plate loads that feed into the stand: axial into the legs, side into the bracing." loading="lazy"><figcaption>Diverter plate loads that feed into the stand: axial into the legs, side into the bracing.</figcaption></figure></div>
+      
+    </article>
+    <aside class="aside reveal d1">
+      <div class="side-box"><h3>Key numbers</h3><div class="item"><div class="num">2,200 lbf</div><span>Engine thrust class</span></div>
+<div class="item"><div class="num">1.5</div><span>Safety factor on thrust in hand calcs</span></div>
+<div class="item"><div class="num">6 + 4</div><span>Posts and tie-down cables checked</span></div></div>
+      <a class="side-box related" href="flame-diverter.html"><div class="mono accent">Linked project</div><h3 style="margin:8px 0 6px">Flame Diverter Analysis &rarr;</h3><span>The plate under the engine, and the loads it puts into this stand.</span></a>
+      <a class="btn ghost" href="../assets/docs/Nicolas-Riveiro-Resume.pdf" target="_blank" rel="noopener">Resume (PDF) &darr;</a>
+    </aside>
+  </div>
+  <nav class="p-nav">
+    <a class="prev" href="flame-diverter.html"><div class="mono" style="color:var(--dim)">&larr; Previous</div><div class="t">Flame Diverter Analysis</div></a>
+    <a class="next" href="separation-lock-test-rig.html"><div class="mono" style="color:var(--dim)">Next &rarr;</div><div class="t">Separation Lock Test Rig</div></a>
+  </nav>
+</div>
+<footer>
+  <div class="wrap mono">
+    <span>&copy; <span class="year">2026</span> Nicolas Riveiro Quintans</span>
+    <span>Aerospace Engineering &middot; Embry-Riddle Aeronautical University</span>
+  </div>
+</footer>
+<div class="lightbox" role="dialog" aria-modal="true"><img alt=""><div class="cap mono"></div></div>
+<script src="../js/main.js"></script>
+</body>
+</html>
